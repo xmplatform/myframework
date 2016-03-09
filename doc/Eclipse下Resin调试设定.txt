@@ -1,0 +1,22 @@
+点击Debug Configurations菜单选择Java Application
+
+Main:
+==Main class:
+com.caucho.server.resin.Resin
+
+Arguments：
+==Program arguments:
+-conf "D:\DEV\resin\conf\resin_core.conf"
+
+==VM arguments:
+-Dresin.home=D:\dev\resin
+-Djava.util.logging.manager=com.caucho.log.LogManagerImpl
+-Xmx512m
+
+Classpath:
+==User entries
+将Resin下lib全部加入
+
+Common:
+==Encoding
+选中other JBK

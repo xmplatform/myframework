@@ -1,0 +1,9 @@
+用于在设置日程类型的时候给日程类型设置颜色。暂时只有日程类型设置的时候用到，其他功能暂时没用到此插件。
+应用步骤：
+1.jscolor.js文件中第二行的"dir"属性指定js调用的arrow.gif等图片的路径。
+2.修改bindClass属性，值为绑定的input的ID属性。
+3.在页面中直接引入jscolor.js文件，调用 jscolor.bind()函数。
+	jQuery("<script type='text/javascript' src='" + FireFly.getContextPath() + "/sy/base/frame/coms/colorPicker/jscolor.js'></script>").appendTo(jQuery("body"));
+	jscolor.bind();
+4.参考服务为：SY_COMM_CAL_TYPE的卡片页。参考调用文件为：SY_COMM_CAL_TYPE_card.js
+2013.1.25--赵振兴

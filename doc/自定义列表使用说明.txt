@@ -1,0 +1,166 @@
+<!--平台通用-列表模板-->
+<!-- 参数-开始 -->
+<#--使用方法及说明
+	--1、单独在模板组织中新建使用该ftl文件中，在个性化参数中可以这样配置
+	[	
+		{'id':'titleT','value':'待处理流程'},
+		{'id':'fieldCode','value':'TODO_TITLE,SEND_USER_CODE__NAME,TODO_SEND_TIME,TODO_CODE_NAME','type':'1'},
+		{'id':'fieldName','value':'标题,发送人,发送时间,类型','type':'1'},
+		{'id':'fieldPercent','value':'38,20,22,15','type':'1'},
+		{'id':'emergField','value':'S_EMERGENCY'},
+		{'id':'servId','value':'SY_COMM_TODO'},
+		{'id':'servType','value':'todo'},
+		{'id':'linkField','value':'TODO_TITLE'},
+	]
+	2、也可以全用json格式
+	[
+		{
+			"id":"json","name":"个性化参数","value":{		
+			"titleT":"用户表",
+			"fieldCode":"USER_CODE,USER_LOGIN_NAME,USER_NAME",
+			"fieldName":"编码,登录名称,用户名",
+			"fieldPercent":"40,30,25",
+			"servId":"SY_ORG_USER",
+			"linkField":"USER_CODE"},"type":"2"
+		}
+	]
+	3、第三种直接使用方式为使用组件中的SY_COMM_LIST_ZDY列表自定义组件
+	此时具备普遍通用性，可以直接在门户模板中选择该组织，之后进行设置，
+	A、将个性化参数，即2中的id为json的value部分
+	{	
+		"titleT":"用户表",
+		"fieldCode":"USER_CODE,USER_LOGIN_NAME,USER_NAME",
+		"fieldName":"编码,登录名称,用户名",
+		"fieldPercent":"40,30,25",
+		"servId":"SY_ORG_USER",
+		"linkField":"USER_CODE"
+	}
+	B、设置查询条件 例如：and 1=1
+	C、设置服务ID 即查询服务例 SY_ORG_USER
+	D、也可设置查询字段 此设置或为空则默认查询字段为 “*”
+	
+	说明：titleT 为模块标题
+		fieldCode 要在列表显示的字段编码信息 与之对应的为列表显示表列标题 fieldName
+		fieldPercent 列所占的百分比
+		emergField 用于判断紧急程序字段 0-10为一般  11-20为紧急 21以上为特急 已在模板中写死
+		servId 为标题“更多”按钮触发的服务ID，当点击时后打开该服务的tab列表 该项若不配置弹出提示框
+-->
+<!-- 参数-结束 -->
+
+<#assign titleName = titleT!"测试">
+<#assign servId = servId!"">
+<#assign fields = fieldCode?split(",")>
+<#assign fieldNames = fieldName?split(",")>
+<#assign percent = fieldPercent?split(",")>
+<#assign emergField = emergField!"false">
+<#assign linkField = linkField!"false">
+<#assign servType = servType!"false">
+<!-- 自定义参数-->
+<style type='text/css'>
+	.normal-img {padding-left: 15px;}
+	.emergency-img {padding-left: 15px; background:url(/sy/theme/default/images/slidemsg/yellow.png) no-repeat  0px 0px transparent; }
+	.hurry-img {padding-left: 15px; background:url(/sy/theme/default/images/slidemsg/red.png) no-repeat  0px 0px transparent;}
+	.linkfield-a{text-decoration: none;}
+</style>
+<!-- 自定义参数结束-->
+<div class='portal-box padding:0' style='min-height:250px;max-height:250px'>
+    <div class='portal-box-title'>
+        <span class="portal-box-title-label">${titleName}(</span><span id='count' style='color:#FF0000'>${_OKCOUNT_}</span><span>)</span>
+        <span class="portal-box-more"><a href="#" onclick="openUrlPage('${titleName}','${servId}','list')"></a></span>
+    </div>
+	<table width="100%">
+	<thead style='line-height:30px;border-bottom: 1px #cccccc solid;'>
+		<#if _DATA_?size != 0>
+		<tr>
+			<td align="center" width='5%'>&nbsp;#</td>
+			<#list fieldNames as field>	
+				<td width="${percent[field_index]}%">${field}</td>
+			</#list>
+		</tr>
+		</#if>
+	</thead>
+	<tbody style='line-height:20px'>
+		<#if (_DATA_?size == 0)>
+			<tr>
+				<td align=center>没有${titleName}处理！</td>
+			</tr>
+		</#if>
+		<#list _DATA_ as content>
+			<tr>
+				<#if emergField!="false">
+					<#assign emerg = content[emergField]>
+					<#if emerg lte 10 >
+						<td align=center>
+							<#if content_index gt 8>
+								<a class='normal-img' style='padding-left:10px'></a>
+							<#else>
+								<a class='normal-img'></a>
+							</#if>
+							${content_index+1}
+						</td>
+					<#elseif emerg lte 20>
+						<td align=center>
+							<#if content_index gt 8>
+								<a class='emergency-img' style='padding-left:10px'></a>
+							<#else>
+								<a class='emergency-img'></a>
+							</#if>
+							${content_index+1}
+						</td>
+					<#else>
+						<td align=center>
+							<#if content_index gt 8>
+								<a class='hurry-img' style='padding-left:10px'></a>
+							<#else>
+								<a class='hurry-img'></a>
+							</#if>
+							${content_index+1}
+						</td>
+					</#if>
+				<#else>
+					<td>${content_index+1}</td>
+				</#if>
+				<#list fields as fieldCode>
+					<#if fieldCode==linkField>
+                    <td>
+                    	<#if servType=="todo">
+	                        <a class = 'linkfield-a' href="javascript:void(0);" 
+							onclick="Todo.open('${content.SERV_ID}','${content.TODO_TITLE}','${content.TODO_URL}', '${content.TODO_CONTENT}', '${content.TODO_ID}', '${content.TODO_OBJECT_ID1}')">
+								${content[fieldCode]}
+							</a>
+						<#else>
+							<a class = 'linkfield-a' href="javascript:void(0);" 
+							onclick="openUrlPage('${titleName}','${servId}','card','${content._PK_}')">
+								${content[fieldCode]}
+							</a>
+						</#if>
+                    </td>
+					<#else>
+						<td>${content[fieldCode]}</td>
+					</#if>					
+				</#list>
+			</tr>
+		</#list>
+	</tbody>
+	</table>
+</div>
+
+<script type='text/javascript'>
+	function openUrlPage(title,servId,type,pk){
+		if(servId==""){
+			alert("请配置打开服务的ID");
+			return;
+		}
+		var opts ={};
+		if(type="card"){
+			opts["url"]=servId+".card.do?pkCode="+pk;
+			opts["tTitle"]=title;
+
+		}else{
+			opts["url"]=servId+".list.do";
+			opts["tTitle"]=title;
+		}
+
+        Tab.open(opts);
+    }
+</script>
